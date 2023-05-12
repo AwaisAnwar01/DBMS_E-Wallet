@@ -60,9 +60,9 @@ def delete_user(db: Session, user_id: int):
 
 
 #crud operations for members
-import pdb ;pdb.set_trace()
-def create_member(db: Session, member: schemas.MemberCreate, processed_by_id: int):
-    db_member = models.Member(**member.dict(), processed_by_id=processed_by_id)
+
+def create_member(db: Session, member: schemas.MemberCreate):
+    db_member = models.Member(**member.dict())
     db.add(db_member)
     db.commit()
     db.refresh(db_member)
@@ -71,23 +71,28 @@ def create_member(db: Session, member: schemas.MemberCreate, processed_by_id: in
 
 
 def get_member(db: Session, member_id: int):
-    return db.query(Member).filter(Member.id == member_id).first()
+    return db.query(Member).filter(Member.Member_id == member_id).first()
 
 
 def get_members(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Member).offset(skip).limit(limit).all()
 
 
-def update_member(db: Session, member: Member, member_update: MemberUpdate):
-    for key, value in member_update.dict(exclude_unset=True).items():
-        setattr(member, key, value)
-    db.add(member)
+def update_member(db: Session, member_id: int, member_update: MemberUpdate):
+    member = db.query(Member).filter(Member.Member_id == member_id).first()
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    update_data = member_update.dict(exclude_unset=True)
+    db.query(Member).filter(Member.Member_id == member_id).update(update_data)
     db.commit()
     db.refresh(member)
     return member
 
 
-def delete_member(db: Session, member: Member):
-    db.delete(member)
-    db.commit()
-    return member
+
+def delete_member(db: Session, member_id: int):
+    member = db.query(models.Member).filter(models.Member.Member_id == member_id).first()
+    if member:
+        db.delete(member)
+        db.commit()
+        return member

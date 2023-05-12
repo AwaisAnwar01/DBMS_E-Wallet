@@ -84,9 +84,11 @@ def delete_user_api(user_id: int, db: Session = Depends(get_db)):
 # create a new member
 
 @app.post("/members/", response_model=schemas.Member)
-def create_member_api(member: schemas.MemberCreate, processed_by_id: int, db: Session = Depends(get_db)):
+def create_member_api(member: schemas.MemberCreate, db: Session = Depends(get_db)):
     try:
-        return crud.create_member(db=db, member=member, processed_by_id=processed_by_id)
+        processed_by_id = member.processed_by_id
+        print(processed_by_id)
+        return crud.create_member(db=db, member=member)
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=str(e))
     
@@ -106,16 +108,19 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
 
 # update a member by id
 @app.put("/members/{member_id}", response_model=schemas.Member)
-def update_member(member_id: int, member: schemas.MemberUpdate, db: Session = Depends(get_db)):
+def update_member(member_id: int, member_update: schemas.MemberUpdate, db: Session = Depends(get_db)):
     db_member = crud.get_member(db, member_id=member_id)
     if db_member is None:
         raise HTTPException(status_code=404, detail="Member not found")
-    return crud.update_member(db=db, member=member, db_member=db_member)
+    return crud.update_member(db=db, member_id=member_id,member_update=member_update)
 
-# delete a member by id
+
+# delete a member by id``
 @app.delete("/members/{member_id}", response_model=schemas.Member)
 def delete_member(member_id: int, db: Session = Depends(get_db)):
     db_member = crud.get_member(db, member_id=member_id)
     if db_member is None:
         raise HTTPException(status_code=404, detail="Member not found")
-    return crud.delete_member(db=db, db_member=db_member)
+    return crud.delete_member(db=db, member_id = member_id)
+
+
