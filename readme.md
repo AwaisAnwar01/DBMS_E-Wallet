@@ -74,7 +74,7 @@ The Digital Wallet Solution System is a platform that allows users to store and 
 ```
 - Withdrawal ID (primary key represented with underline)
 - Transaction code
-- Member ID (foreign key)
+- Member ID (foreign key for user verification)
 - Amount
 - Charged
 - To receive
