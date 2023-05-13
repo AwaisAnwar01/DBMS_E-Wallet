@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String,ForeignKey
+from sqlalchemy import Column, Integer, String,ForeignKey,Boolean,Float,DateTime
 from database import Base
 
 
@@ -29,3 +29,36 @@ class Member(Base):
     account_status = Column(Integer)
     processed_by_id = Column(Integer, ForeignKey("Users.id"))
     processed_by = relationship("User", backref="processed_by")
+
+
+
+#Currency_Support Model
+
+class Currency_supported(Base):
+    __tablename__= "Currency_Supported"
+
+    currency_name= Column(String(25))
+    currency_id=Column(Integer , primary_key= True , index = True)
+    currency_symbol=Column(String(10))
+    status= Column( Boolean , default= False)
+    USD_equivalent=Column(Integer)
+
+
+
+#Deposit Model
+class Deposit(Base):
+    __tablename__ = "deposits"
+
+    id = Column(Integer, primary_key=True, index=True)
+    transaction_code = Column(String(20), unique=True)
+    member_id = Column(Integer, ForeignKey("members.id"))
+    deposit_amount = Column(Float)
+    currency_id = Column(Integer, ForeignKey("currency_supported.id"))
+    date_time = Column(DateTime, default=datetime.utcnow())
+    payment_gateway_id = Column(Integer, ForeignKey("gateways.id"))
+    status = Column(Integer, default=0)
+    remarks = Column(String(255))
+
+    member = relationship("Member", back_populates="deposits")
+    currency_supported = relationship("CurrencySupported", back_populates="deposits")
+    gateway = relationship("Gateway", back_populates="deposits")

@@ -96,3 +96,59 @@ def delete_member(db: Session, member_id: int):
         db.delete(member)
         db.commit()
         return member
+    
+
+    #CRUD operation for currency supported
+
+def add_currency(db: Session, currency_supported: schemas.add_currency):
+    #import pdb ; pdb.set_trace()
+    currency_in_db = models.Currency_supported(**currency_supported.dict())
+    db.add(currency_in_db)
+    db.commit()
+    db.refresh(currency_in_db)
+    return currency_in_db
+
+
+
+
+
+
+def get_currency(db: Session, currency_id: int):
+    return db.query(models.Currency_supported).filter(models.Currency_supported.currency_id ==currency_id ).first()
+
+
+
+def get_currencies(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Currency_supported).offset(skip).limit(limit).all()
+
+
+def update_currency(db: Session, currency_id: int, currency_update: schemas.update_currency):
+    currency = db.query(models.Currency_supported).filter(models.Currency_supported.currency_id == currency_id).first()
+    if not currency:
+        raise HTTPException(status_code=404, detail="Currency not found")
+    update_data = currency_update.dict(exclude_unset=True)
+    db.query(models.Currency_supported).filter(models.Currency_supported.currency_id == currency_id).update(update_data)
+    db.commit()
+    db.refresh(currency)
+    return currency
+
+
+def delete_currency(db: Session, currency_id : int):
+    currency = db.query(models.Currency_supported).filter(models.Currency_supported.currency_id == currency_id).first()
+    if currency:
+        db.delete(currency)
+        db.commit()
+        return currency
+
+
+
+def delete_member(db: Session, member_id: int):
+    member = db.query(models.Member).filter(models.Member.Member_id == member_id).first()
+    if member:
+        db.delete(member)
+        db.commit()
+        return member
+    
+
+
+    

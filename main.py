@@ -1,4 +1,4 @@
-from fastapi import FastAPI,HTTPException,Query,Depends
+from fastapi import FastAPI,HTTPException,Query,Depends,status
 from typing import Optional,List
 # from pydantic import BaseModel
 import mysql.connector
@@ -81,7 +81,7 @@ def delete_user_api(user_id: int, db: Session = Depends(get_db)):
 
 # CRUD operations for Member entity
 
-# create a new member
+#create a new member
 
 @app.post("/members/", response_model=schemas.Member)
 def create_member_api(member: schemas.MemberCreate, db: Session = Depends(get_db)):
@@ -91,6 +91,7 @@ def create_member_api(member: schemas.MemberCreate, db: Session = Depends(get_db
         return crud.create_member(db=db, member=member)
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=str(e))
+    
     
 # get all members
 @app.get("/members/", response_model=List[schemas.Member])
@@ -124,3 +125,56 @@ def delete_member(member_id: int, db: Session = Depends(get_db)):
     return crud.delete_member(db=db, member_id = member_id)
 
 
+
+# API's for operations of currency_supported entity
+
+# Adding a New currency 
+
+@app.post("/currency_supported/", response_model=schemas.currency_supported)
+def add_currency(currency_supported: schemas.add_currency,  db: Session = Depends(get_db)):
+    try:
+        return crud.add_currency(db=db, currency_supported=currency_supported)
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    
+
+    
+ #get all currencies
+@app.get("/currency_supported/", response_model=List[schemas.currency_supported])
+def read_currencies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    currencies = crud.get_currencies(db, skip=skip, limit=limit)
+    return currencies
+
+# get a specific currency by id
+@app.get("/currency_supported/{currency_id}", response_model=schemas.currency_supported)
+def read_currency(currency_id: int, db: Session = Depends(get_db)):
+    db_currency = crud.get_currency(db, currency_id=currency_id)
+    if db_currency is None:
+        raise HTTPException(status_code=404, detail="Currency not found")
+    return db_currency
+
+# update a currency by id
+@app.put("/currency_supported/{currency_id}", response_model=schemas.currency_supported)
+def update_currency(currency_id: int, currency_update: schemas.update_currency, db: Session = Depends(get_db)):
+    db_currency = crud.get_currency(db, currency_id= currency_id)
+    if db_currency is None:
+        raise HTTPException(status_code=404, detail="currency not found")
+    return crud.update_currency(db=db, currency_id=currency_id, currency_update= currency_update)
+
+
+
+# delete a currency by id
+@app.delete("/currency_supported/{currenc_id}", response_model=schemas.currency_supported)
+def delete_currency(currency_id: int, db: Session = Depends(get_db)):
+    db_currency = crud.get_currency(db, currency_id=currency_id)
+    if db_currency is None:
+        raise HTTPException(status_code=404, detail="currency not found")
+    return crud.delete_currency(db=db,currency_id = currency_id)  
+
+
+@app.delete("/members/{member_id}", response_model=schemas.Member)
+def delete_member(member_id: int, db: Session = Depends(get_db)):
+    db_member = crud.get_member(db, member_id=member_id)
+    if db_member is None:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return crud.delete_member(db=db, member_id = member_id)

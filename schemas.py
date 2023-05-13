@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel,constr
 
 # User schema 
 class UserBase(BaseModel):
@@ -51,4 +51,30 @@ class Member(MemberBase):
    # id: int
 
     class Config:
+        orm_mode = True
+
+
+
+#currency supported schema
+
+class currency_supported_base(BaseModel):
+    currency_name : str
+    currency_symbol: constr(max_length=10)
+    status : bool
+    USD_equivalent : int
+    
+    class Config:
+        orm_mode = True
+    
+
+class add_currency(currency_supported_base):
+    pass    
+
+class update_currency(currency_supported_base):
+    pass
+
+class currency_supported(currency_supported_base):
+  #  currency_id : int 
+    
+    class config:
         orm_mode = True
