@@ -150,5 +150,84 @@ def delete_member(db: Session, member_id: int):
         return member
     
 
+#crud operations for Deposit
+
+
+def create_deposit(db: Session, deposit:schemas.DepositCreate):
+    db_deposit = models.Deposit(**deposit.dict())
+    db.add(db_deposit)
+    db.commit()
+    db.refresh(db_deposit)
+    return db_deposit
+
+
+def get_deposit(db: Session, deposit_id: int):
+    return db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
+
+
+def get_deposits(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Deposit).offset(skip).limit(limit).all()
+
+
+def update_deposit(db: Session, deposit_id: int, deposit_update: schemas.DepositUpdate):
+    deposit = db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
+    if not deposit:
+        raise HTTPException(status_code=404, detail="Deposit not found")
+    update_data = deposit_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(deposit, key, value)
+    db.commit()
+    db.refresh(deposit)
+    return deposit
+
+
+
+def delete_deposit(db: Session, deposit_id: int):
+    db_deposit = db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
+    if db_deposit:
+        db.delete(db_deposit)
+        db.commit()
+        return db_deposit
+
+#CRUD operation for Gateway
+
+def add_gateway(db: Session, gateway: schemas.add_gateway):
+    #import pdb ; pdb.set_trace()
+    gateway_in_db = models.gateway(**gateway.dict())
+    db.add(gateway_in_db)
+    db.commit()
+    db.refresh(gateway_in_db)
+    return gateway_in_db
+
+
+
+def get_gateway(db: Session, gateway_id: int):
+    return db.query(models.gateway).filter(models.gateway.gateway_id ==gateway_id ).first()
+
+
+
+def get_gateways(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.gateway).offset(skip).limit(limit).all()
+
+
+def update_gateway(db: Session, gateway_id: int, gateway_update: schemas.update_gateway):
+    gateway = db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id).first()
+    if not gateway:
+        raise HTTPException(status_code=404, detail="gateway not found")
+    update_data = gateway_update.dict(exclude_unset=True)
+    db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id).update(update_data)
+    db.commit()
+    db.refresh(gateway)
+    return gateway
+
+
+def delete_gateway(db: Session, gateway_id : int):
+    gateway = db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id ).first()
+    if gateway:
+        db.delete(gateway)
+        db.commit()
+        return gateway
+
+
 
     

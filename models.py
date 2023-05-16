@@ -30,7 +30,7 @@ class Member(Base):
     processed_by_id = Column(Integer, ForeignKey("Users.id"))
     processed_by = relationship("User", backref="processed_by")
 
-
+    deposits = relationship("Deposit", back_populates="member")
 
 #Currency_Support Model
 
@@ -43,22 +43,34 @@ class Currency_supported(Base):
     status= Column( Boolean , default= False)
     USD_equivalent=Column(Integer)
 
+    deposits = relationship("Deposit", back_populates="currency_supported")
 
 
-#Deposit Model
 class Deposit(Base):
     __tablename__ = "deposits"
 
     id = Column(Integer, primary_key=True, index=True)
-    transaction_code = Column(String(20), unique=True)
-    member_id = Column(Integer, ForeignKey("members.id"))
+    transaction_code = Column(String(30), unique=True, index=True)
+    member_id = Column(Integer, ForeignKey("Members.Member_id"))
     deposit_amount = Column(Float)
-    currency_id = Column(Integer, ForeignKey("currency_supported.id"))
-    date_time = Column(DateTime, default=datetime.utcnow())
-    payment_gateway_id = Column(Integer, ForeignKey("gateways.id"))
-    status = Column(Integer, default=0)
-    remarks = Column(String(255))
+    currency_id = Column(Integer, ForeignKey("Currency_Supported.currency_id"))
+    date_time = Column(DateTime)
+    gateway_id = Column(Integer, ForeignKey("Gateway.gateway_id"))
+    status = Column(Integer)
+    remarks = Column(String(40))
 
     member = relationship("Member", back_populates="deposits")
-    currency_supported = relationship("CurrencySupported", back_populates="deposits")
-    gateway = relationship("Gateway", back_populates="deposits")
+    currency_supported = relationship("Currency_supported", back_populates="deposits")
+    gateway = relationship("gateway", back_populates="deposits")
+
+#Gateway Model
+
+class gateway(Base):
+    __tablename__ = "Gateway"
+    
+    gateway_id = Column(Integer , primary_key= True , index=True )
+    gateway_name =Column(String(25))
+    gateway_status =Column(Boolean , default=False)
+    gateway_type =Column(String(30))
+
+    deposits = relationship("Deposit", back_populates="gateway")
