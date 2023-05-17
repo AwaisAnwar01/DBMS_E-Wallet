@@ -173,6 +173,40 @@ def delete_currency_api(currency_id: int, db: Session = Depends(get_db)):
     return crud.delete_currency(db=db,currency_id = currency_id)  
 
 
+#APIs for Deposit entity
+@app.post("/withdrawals/", response_model=schemas.Withdrawal)
+def create_withdrawal(withdrawal: schemas.WithdrawalCreate, db: Session = Depends(get_db)):
+    return crud.create_withdrawal(db, withdrawal)
+
+
+@app.get("/withdrawals/{withdrawal_id}", response_model=schemas.Withdrawal)
+def get_withdrawal(withdrawal_id: int, db: Session = Depends(get_db)):
+    db_withdrawal = crud.get_withdrawal(db, withdrawal_id)
+    if db_withdrawal is None:
+        raise HTTPException(status_code=404, detail="Withdrawal not found")
+    return db_withdrawal
+
+
+@app.get("/withdrawals/", response_model=list[schemas.Withdrawal])
+def get_all_withdrawals(db: Session = Depends(get_db)):
+    return crud.get_all_withdrawals(db)
+
+
+@app.put("/withdrawals/{withdrawal_id}", response_model=schemas.Withdrawal)
+def update_withdrawal(withdrawal_id: int, withdrawal: schemas.WithdrawalUpdate, db: Session = Depends(get_db)):
+    db_withdrawal = crud.get_withdrawal(db, withdrawal_id)
+    if db_withdrawal is None:
+        raise HTTPException(status_code=404, detail="Withdrawal not found")
+    return crud.update_withdrawal(db, withdrawal_id, withdrawal)
+
+
+@app.delete("/withdrawals/{withdrawal_id}")
+def delete_withdrawal(withdrawal_id: int, db: Session = Depends(get_db)):
+    db_withdrawal = crud.get_withdrawal(db, withdrawal_id)
+    if db_withdrawal is None:
+        raise HTTPException(status_code=404, detail="Withdrawal not found")
+    return crud.delete_withdrawal(db, withdrawal_id)
+
 # API's for operations of Deposit entity
 
 # Adding a New Deposit 
@@ -262,15 +296,39 @@ def delete_gateway_api(gateway_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="gateway not found")
     return crud.delete_gateway(db=db,gateway_id= gateway_id)  
 
+#APIs for Transaction logs 
+@app.post("/transaction_logs/", response_model=schemas.TransactionLog)
+def create_transaction_log(transaction_log: schemas.TransactionLogCreate, db: Session = Depends(get_db)):
+    return crud.create_transaction_log(db, transaction_log)
 
-# @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-# def delete(id: str):
 
-#     query = f"delete from post where id = {id}"
-#     mycursor.execute(query)
-#     myresult = mycursor.fetchone()
-#     mydb.commit()
-#     if myresult==None:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post does not exist")
-#     return Response(status_code=status.HTTP_204_NO_CONTENT, detail="Post was deleted")
+@app.get("/transaction_logs/{transaction_log_id}", response_model=schemas.TransactionLog)
+def get_transaction_log(transaction_log_id: int, db: Session = Depends(get_db)):
+    db_transaction_log = crud.get_transaction_log(db, transaction_log_id)
+    if db_transaction_log is None:
+        raise HTTPException(status_code=404, detail="Transaction Log not found")
+    return db_transaction_log
+
+
+@app.get("/transaction_logs/", response_model=list[schemas.TransactionLog])
+def get_all_transaction_logs(db: Session = Depends(get_db)):
+    return crud.get_all_transaction_logs(db)
+
+
+@app.put("/transaction_logs/{transaction_log_id}", response_model=schemas.TransactionLog)
+def update_transaction_log(transaction_log_id: int, transaction_log: schemas.TransactionLogUpdate,
+                          db: Session = Depends(get_db)):
+    db_transaction_log = crud.get_transaction_log(db, transaction_log_id)
+    if db_transaction_log is None:
+        raise HTTPException(status_code=404, detail="Transaction Log not found")
+    return crud.update_transaction_log(db, transaction_log_id, transaction_log)
+
+
+@app.delete("/transaction_logs/{transaction_log_id}")
+def delete_transaction_log(transaction_log_id: int, db: Session = Depends(get_db)):
+    db_transaction_log = crud.get_transaction_log(db, transaction_log_id)
+    if db_transaction_log is None:
+        raise HTTPException(status_code=404, detail="Transaction Log not found")
+    return crud.delete_transaction_log(db, transaction_log_id)
+
 

@@ -27,10 +27,12 @@ class Member(Base):
     username = Column(String(50), unique=True, index=True)
     password = Column(String(50))
     account_status = Column(Integer)
+
     processed_by_id = Column(Integer, ForeignKey("Users.id"))
     processed_by = relationship("User", backref="processed_by")
-
     deposits = relationship("Deposit", back_populates="member")
+    withdrawals = relationship('Withdrawal', back_populates='member')
+    transaction_logs = relationship('TransactionLog', back_populates='member')
 
 #Currency_Support Model
 
@@ -44,6 +46,23 @@ class Currency_supported(Base):
     USD_equivalent=Column(Integer)
 
     deposits = relationship("Deposit", back_populates="currency_supported")
+
+class Withdrawal(Base):
+    __tablename__ = 'withdrawals'
+
+    withdrawal_id = Column(Integer, primary_key=True, autoincrement=True)
+    transaction_code = Column(String(30))
+    amount = Column(Float)
+    charged = Column(Float)
+    to_receive = Column(Float)
+    date_time = Column(DateTime)
+    method = Column(String(30))
+    status = Column(Integer)
+    remarks = Column(String(30))
+    member_id = Column(Integer, ForeignKey("Members.Member_id"))
+
+    member = relationship('Member', back_populates='withdrawals')
+
 
 
 class Deposit(Base):
@@ -74,3 +93,15 @@ class gateway(Base):
     gateway_type =Column(String(30))
 
     deposits = relationship("Deposit", back_populates="gateway")
+
+
+class TransactionLog(Base):
+    __tablename__ = 'transaction_logs'
+
+    transaction_log_id = Column(Integer, primary_key=True, autoincrement=True)
+    member_id = Column(Integer, ForeignKey("Members.Member_id"))
+    transaction_type = Column(Integer)
+    amount = Column(Float)
+    status = Column(Integer)
+
+    member = relationship('Member', back_populates='transaction_logs')

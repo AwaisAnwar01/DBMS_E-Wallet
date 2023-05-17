@@ -47,7 +47,7 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
+    return  {"message":"User Updated Successfully"}
 
 
 def delete_user(db: Session, user_id: int):
@@ -56,7 +56,7 @@ def delete_user(db: Session, user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
     db.commit()
-    return db_user
+    return  {"message":"User deleted Successfully"}
 
 
 #crud operations for members
@@ -86,7 +86,7 @@ def update_member(db: Session, member_id: int, member_update: MemberUpdate):
     db.query(Member).filter(Member.Member_id == member_id).update(update_data)
     db.commit()
     db.refresh(member)
-    return member
+    return  {"message":"Member updated Successfully"}
 
 
 
@@ -95,7 +95,7 @@ def delete_member(db: Session, member_id: int):
     if member:
         db.delete(member)
         db.commit()
-        return member
+        return  {"message":"Member deleted Successfully"}
     
 
     #CRUD operation for currency supported
@@ -130,7 +130,7 @@ def update_currency(db: Session, currency_id: int, currency_update: schemas.upda
     db.query(models.Currency_supported).filter(models.Currency_supported.currency_id == currency_id).update(update_data)
     db.commit()
     db.refresh(currency)
-    return currency
+    return  {"message":"Currency  Updated Successfully"}
 
 
 def delete_currency(db: Session, currency_id : int):
@@ -138,7 +138,7 @@ def delete_currency(db: Session, currency_id : int):
     if currency:
         db.delete(currency)
         db.commit()
-        return currency
+        return  {"message":"Currency deleted Successfully"}
 
 
 
@@ -149,7 +149,39 @@ def delete_member(db: Session, member_id: int):
         db.commit()
         return member
     
+def get_withdrawal(db: Session, withdrawal_id: int):
+    return db.query(models.Withdrawal).filter(models.Withdrawal.withdrawal_id == withdrawal_id).first()
 
+
+def get_all_withdrawals(db: Session):
+    return db.query(models.Withdrawal).all()
+
+
+def create_withdrawal(db: Session, withdrawal: schemas.WithdrawalCreate):
+    withdrawal_data = models.Withdrawal(**withdrawal.dict())
+    db.add(withdrawal_data)
+    db.commit()
+    db.refresh(withdrawal_data)
+    return withdrawal_data
+
+
+def update_withdrawal(db: Session, withdrawal_id: int, withdrawal: schemas.WithdrawalUpdate):
+    withdrawal_data = db.query(models.Withdrawal).filter(models.Withdrawal.withdrawal_id == withdrawal_id).first()
+    if withdrawal_data:
+        for key, value in withdrawal.dict(exclude_unset=True).items():
+            setattr(withdrawal_data, key, value)
+        db.commit()
+        db.refresh(withdrawal_data)
+    return  {"message":"Withdrawal updated Successfully"}
+
+
+def delete_withdrawal(db: Session, withdrawal_id: int):
+    withdrawal_data = db.query(models.Withdrawal).filter(models.Withdrawal.withdrawal_id == withdrawal_id).first()
+    if withdrawal_data:
+        db.delete(withdrawal_data)
+        db.commit()
+        return {"message":"Withdrawal deleted Successfully"}
+    return { {"message":"Not existed"}}
 #crud operations for Deposit
 
 
@@ -178,7 +210,7 @@ def update_deposit(db: Session, deposit_id: int, deposit_update: schemas.Deposit
         setattr(deposit, key, value)
     db.commit()
     db.refresh(deposit)
-    return deposit
+    return {"message":"Deposit updated Successfully"}
 
 
 
@@ -187,7 +219,7 @@ def delete_deposit(db: Session, deposit_id: int):
     if db_deposit:
         db.delete(db_deposit)
         db.commit()
-        return db_deposit
+        return {"message":"Deposit deleted Successfully"}
 
 #CRUD operation for Gateway
 
@@ -218,7 +250,7 @@ def update_gateway(db: Session, gateway_id: int, gateway_update: schemas.update_
     db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id).update(update_data)
     db.commit()
     db.refresh(gateway)
-    return gateway
+    return {"message":"Gateway Updated Successfully"}
 
 
 def delete_gateway(db: Session, gateway_id : int):
@@ -226,8 +258,43 @@ def delete_gateway(db: Session, gateway_id : int):
     if gateway:
         db.delete(gateway)
         db.commit()
-        return gateway
+        return {"message":"Gateway deleted Successfully"}
 
 
-
+#Crud Operations for Transaction Logs 
     
+def get_transaction_log(db: Session, transaction_log_id: int):
+    return db.query(models.TransactionLog).filter(models.TransactionLog.transaction_log_id == transaction_log_id).first()
+
+
+def get_all_transaction_logs(db: Session):
+    return db.query(models.TransactionLog).all()
+
+
+def create_transaction_log(db: Session, transaction_log: schemas.TransactionLogCreate):
+    transaction_log_data = models.TransactionLog(**transaction_log.dict())
+    db.add(transaction_log_data)
+    db.commit()
+    db.refresh(transaction_log_data)
+    return transaction_log_data
+
+
+def update_transaction_log(db: Session, transaction_log_id: int, transaction_log: schemas.TransactionLogUpdate):
+    transaction_log_data = db.query(models.TransactionLog).filter(
+        models.TransactionLog.transaction_log_id == transaction_log_id).first()
+    if transaction_log_data:
+        for key, value in transaction_log.dict(exclude_unset=True).items():
+            setattr(transaction_log_data, key, value)
+        db.commit()
+        db.refresh(transaction_log_data)
+    return transaction_log_data
+
+
+def delete_transaction_log(db: Session, transaction_log_id: int):
+    transaction_log_data = db.query(models.TransactionLog).filter(
+        models.TransactionLog.transaction_log_id == transaction_log_id).first()
+    if transaction_log_data:
+        db.delete(transaction_log_data)
+        db.commit()
+        return {"message":"LOg deleted Successfully"}
+    return {"message":"LOg not existed"}

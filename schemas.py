@@ -75,13 +75,39 @@ class update_currency(currency_supported_base):
     pass
 
 class currency_supported(currency_supported_base):
-  #  currency_id : int 
+    currency_id : int 
     
     class config:
         orm_mode = True
 
 
 
+
+class WithdrawalBase(BaseModel):
+    transaction_code: str
+    amount: float
+    charged: float
+    to_receive: float
+    date_time: datetime
+    method: str
+    status: int
+    remarks: str
+
+
+class WithdrawalCreate(WithdrawalBase):
+    member_id: int
+
+
+class WithdrawalUpdate(WithdrawalBase):
+    pass
+
+
+class Withdrawal(WithdrawalBase):
+    withdrawal_id: int
+    member_id: int
+
+    class Config:
+        orm_mode = True
 
 
 class DepositBase(BaseModel):
@@ -107,7 +133,7 @@ class DepositUpdate(DepositBase):
 
 
 class Deposit(DepositBase):
-    #id: int
+    id: int
 
     class Config:
         orm_mode = True
@@ -132,7 +158,29 @@ class update_gateway(gateway_base):
     pass
 
 class gateway(gateway_base):
-    #gateway_id : int 
+    gateway_id : int 
     
     class config:
+        orm_mode = True
+
+
+class TransactionLogBase(BaseModel):
+    member_id: int
+    transaction_type: int
+    amount: float
+    status: int
+
+
+class TransactionLogCreate(TransactionLogBase):
+    pass
+
+
+class TransactionLogUpdate(TransactionLogBase):
+    pass
+
+
+class TransactionLog(TransactionLogBase):
+    transaction_log_id: int
+
+    class Config:
         orm_mode = True
