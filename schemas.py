@@ -133,7 +133,7 @@ class DepositUpdate(DepositBase):
 
 
 class Deposit(DepositBase):
-    id: int
+   # id: int
 
     class Config:
         orm_mode = True

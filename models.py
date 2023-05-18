@@ -1,6 +1,7 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String,ForeignKey,Boolean,Float,DateTime
 from database import Base
+from sqlalchemy import event
 
 
 # User Model
@@ -28,11 +29,12 @@ class Member(Base):
     password = Column(String(50))
     account_status = Column(Integer)
 
-    processed_by_id = Column(Integer, ForeignKey("Users.id"))
-    processed_by = relationship("User", backref="processed_by")
-    deposits = relationship("Deposit", back_populates="member")
-    withdrawals = relationship('Withdrawal', back_populates='member')
-    transaction_logs = relationship('TransactionLog', back_populates='member')
+    processed_by_id = Column(Integer, ForeignKey("Users.id"), onupdate='CASCADE')
+    processed_by = relationship("User", backref="processed_by", passive_deletes=True)
+    deposits = relationship("Deposit", back_populates="member", passive_deletes=True)
+    withdrawals = relationship('Withdrawal', back_populates='member', passive_deletes=True)
+    transaction_logs = relationship('TransactionLog', back_populates='member', passive_deletes=True)
+
 
 #Currency_Support Model
 
@@ -45,7 +47,7 @@ class Currency_supported(Base):
     status= Column( Boolean , default= False)
     USD_equivalent=Column(Integer)
 
-    deposits = relationship("Deposit", back_populates="currency_supported")
+    deposits = relationship("Deposit", back_populates="currency_supported", passive_deletes=True)
 
 class Withdrawal(Base):
     __tablename__ = 'withdrawals'
@@ -59,9 +61,9 @@ class Withdrawal(Base):
     method = Column(String(30))
     status = Column(Integer)
     remarks = Column(String(30))
-    member_id = Column(Integer, ForeignKey("Members.Member_id"))
+    member_id = Column(Integer, ForeignKey("Members.Member_id", onupdate='CASCADE',  ondelete="CASCADE"))
 
-    member = relationship('Member', back_populates='withdrawals')
+    member = relationship('Member', back_populates='withdrawals', passive_deletes=True)
 
 
 
@@ -70,17 +72,17 @@ class Deposit(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     transaction_code = Column(String(30), unique=True, index=True)
-    member_id = Column(Integer, ForeignKey("Members.Member_id"))
+    member_id = Column(Integer, ForeignKey("Members.Member_id", onupdate='CASCADE',  ondelete="CASCADE"))
     deposit_amount = Column(Float)
-    currency_id = Column(Integer, ForeignKey("Currency_Supported.currency_id"))
+    currency_id = Column(Integer, ForeignKey("Currency_Supported.currency_id", onupdate='CASCADE',  ondelete="CASCADE"))
     date_time = Column(DateTime)
-    gateway_id = Column(Integer, ForeignKey("Gateway.gateway_id"))
+    gateway_id = Column(Integer, ForeignKey("Gateway.gateway_id", onupdate='CASCADE',  ondelete="CASCADE"))
     status = Column(Integer)
     remarks = Column(String(40))
 
     member = relationship("Member", back_populates="deposits")
-    currency_supported = relationship("Currency_supported", back_populates="deposits")
-    gateway = relationship("gateway", back_populates="deposits")
+    currency_supported = relationship("Currency_supported", back_populates="deposits", passive_deletes=True)
+    gateway = relationship("gateway", back_populates="deposits", passive_deletes=True)
 
 #Gateway Model
 
@@ -92,16 +94,16 @@ class gateway(Base):
     gateway_status =Column(Boolean , default=False)
     gateway_type =Column(String(30))
 
-    deposits = relationship("Deposit", back_populates="gateway")
+    deposits = relationship("Deposit", back_populates="gateway", passive_deletes=True)
 
 
 class TransactionLog(Base):
     __tablename__ = 'transaction_logs'
 
     transaction_log_id = Column(Integer, primary_key=True, autoincrement=True)
-    member_id = Column(Integer, ForeignKey("Members.Member_id"))
+    member_id = Column(Integer, ForeignKey("Members.Member_id", onupdate='CASCADE', ondelete="CASCADE"))
     transaction_type = Column(Integer)
     amount = Column(Float)
     status = Column(Integer)
 
-    member = relationship('Member', back_populates='transaction_logs')
+    member = relationship('Member', back_populates='transaction_logs', passive_deletes=True)

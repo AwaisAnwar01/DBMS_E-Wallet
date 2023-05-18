@@ -241,7 +241,6 @@ def get_gateway(db: Session, gateway_id: int):
 def get_gateways(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.gateway).offset(skip).limit(limit).all()
 
-
 def update_gateway(db: Session, gateway_id: int, gateway_update: schemas.update_gateway):
     gateway = db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id).first()
     if not gateway:
@@ -251,6 +250,8 @@ def update_gateway(db: Session, gateway_id: int, gateway_update: schemas.update_
     db.commit()
     db.refresh(gateway)
     return {"message":"Gateway Updated Successfully"}
+
+
 
 
 def delete_gateway(db: Session, gateway_id : int):
