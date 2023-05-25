@@ -142,9 +142,12 @@ This documentation provides an overview of the entities and relationships within
 
 The Digital Wallet Solution System is a platform that enables users to store and manage their digital currency and perform transactions with ease. The system comprises six entities, including Currency Supported, Deposit, Gateway, User, Member, Withdrawal, and Transaction Log. The relationships between these entities have also been defined. The documentation provides an overview of each entity and its attributes, allowing users to effectively manage their digital currency.
 
+``` 
+
+
+## Relational Representation
+
 ```
-
-
 
 +--------------+          +------------------+           +----------+
 | Currency     |          | Deposit          |           | Gateway  |
@@ -197,3 +200,5 @@ The Digital Wallet Solution System is a platform that enables users to store and
 | Amount        |    |
 | Status        |    |
 +--------------+    |
+
+```
