@@ -11,10 +11,19 @@ The Digital Wallet Solution System is a platform that allows users to store and 
 ### Currency Supported
 ```
 - Currency ID (primary key represented with underline)
-- Currency name
-- Currency symbol
+- Currency info id(Foreign key)
 - USD equivalent
 - Status – (0)active, (1)inactive
+```
+
+
+### Currency Info
+```
+- Currency info id(Primary key)
+- Currency Name 
+- Currency Symbol
+
+
 ```
 ### Deposit
 ```
@@ -25,9 +34,18 @@ The Digital Wallet Solution System is a platform that allows users to store and 
 - Currency ID
 - Date time
 - Payment gateway ID
-- Status – (0)pending, (1)successful, (2)rejected
-- Remarks
+- Status id(foreign key)
 ```
+
+### Deposit Status
+
+ '''
+-Status ID(Primary key)
+-Status
+-Remarks
+ '''
+
+
 ### Gateway
 
 ```
