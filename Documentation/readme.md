@@ -150,79 +150,79 @@ The Digital Wallet Solution System is a platform that enables users to store and
 ```
 
 +--------------+          +------------------+           +----------+
-| Currency     |          | Deposit          |           | Gateway  |
+|CurrencySupported|        | Deposit        |            | Gateway  |
 +--------------+          +------------------+           +----------+
 | Currency_ID  |          | Deposit_ID       |           | Gateway_ID |
-| Currency_info_id|   +----> | Transaction_code |    +---->  | Gateway_name|
-| USD_equivalent|   |      | Member_ID (FK)   |    |      | Type     |
-| Status       |   |      | Deposit_amount  |    |      | Status   |
-+--------------+   |      | Currency_ID (FK) |    |      +----------+
+| Status       |   +----> | Transaction_code |    +----> | Gateway_name|
+| USD_equivalent|   |      | Member_ID (FK)  |    |      | Type     |
+|Currency_info_id|<---+   | Deposit_amount  |    |      | Status   |
++--------------+    |      | Currency_ID (FK)|    |      +----------+
                     |      | Date_time       |    |
                     |      | Payment_gateway_ID (FK)| 
-                    |      | Status_id (FK)  |    |
-                    |      | Remarks         |    |
-                    |      +------------------+    |
-                    |                                |
-                    |                                |
-+--------------+    |                                |
-| User         |    |                                |
-+--------------+    |     +---------------------+  |
-| User_ID      |    |     | Withdrawal          |  |
-| Username     |    |     +---------------------+  |
-| Password     |    |     | Withdrawal_ID       |  |
-| Complete_name|    |     | Transaction_code    |  |
-| Email address|    +---> | Member_ID (FK)      |  |
-+--------------+    |     | Amount              |  |
-                    |     | Charged             |  |
-                    |     | To_receive         |  |
-                    |     | Date_time          |  |
-                    |     | Method              |  |
-                    |     | Status              |  |
-                    |     | Remarks             |  |
-                    |     +---------------------+  |
-                    |                                |
-+--------------+    |                                |
-| Member       |    |                                |
-+--------------+    |                                |
-| Member_ID    |    |                                |
-| First_name   |    |                                |
-| Middle_name  |    |                                |
-| Last_name    |    |                                |
-| Email_address|    |                                |
-| Country      |    |                                |
-| Contact_number|   |                                |
-| Username     |   |                                |
-| Password     |   |                                |
-| Account_status|   |                                |
-| Processed_by  |   |                                |
-+--------------+   |                                |
-                    |                                |
-+--------------+    |                                |
-| Transaction   |    |                                |
-+--------------+    |                                |
-| Transaction_ID|    |                                |
-| Member_ID (FK)|    |                                |
-| Type          |    |                                |
-| Amount        |    |                                |
-| Status        |    |                                |
-+--------------+    |                                |
-                    |                                |
-+------------------+ |                                |
-| Currency Info    | |                                |
-+------------------+ |                                |
-| Currency_info_id | |                                |
-| Currency Name    | |                                |
-| Currency Symbol  | |                                |
-+------------------+ |                                |
-                    |                                |
-+------------------+ |                                |
-| Deposit Status   | |                                |
-+------------------+ |                                |
-| Status_id        | |                                |
-| Status           | |                                |
-| Remarks          | |                                |
-+------------------+ |                                |
-                    |                                |
+                    |+---->| Status_id (FK)  |    
+                    |      | Remarks         |    
+                    |      +------------------+   
+                    |                             
+                    |                             
++--------------+    |                             |
+| User         |    |                             |
++--------------+    |     +---------------------+ |
+| User_ID      |    |     | Withdrawal          | |
+| Username     |    |     +---------------------+ |
+| Password     |    |     | Withdrawal_ID       | |
+| Complete_name|    |     | Transaction_code    | |
+| Email address|    +---> | Member_ID (FK)      | |
++--------------+    |     | Amount              | |
+                    |     | Charged             | |
+                    |     | To_receive          | |
+                    |     | Date_time           | |
+                    |     | Method              | |
+                    |     | Status              | |
+                    |     | Remarks             | |
+                    |     +---------------------+ |
+                    |                                
++--------------+    |                                
+| Member       |    |                                
++--------------+    |                                
+| Member_ID    |    |                                
+| First_name   |    |                                
+| Middle_name  |    |                                
+| Last_name    |    |                                
+| Email_address|    |                                
+| Country      |    |                                
+| Contact_number|   |                                
+| Username     |    |                                
+| Password     |    |                               
+| Account_status|   |                                
+| Processed_by  |   |                                
++--------------+    |                               
+                    |                                
++--------------+    |                                
+| Transaction   |   |                                
++--------------+    |                                
+| Transaction_ID|   |                                
+| Member_ID (FK)|   |                                
+| Type          |   |                                
+| Amount        |   |                                
+| Status        |   |                                
++--------------+    |                                
+                    |_                                
++------------------+ |                                
+| Currency Info    | |                                
++------------------+ |                                
+| Currency_info_id |-|                                
+| Currency Name    | |                                
+| Currency Symbol  | |                                
++------------------+ |                               
+                     |                                
++------------------+ |                                
+| Deposit Status   | |                                
++------------------+ |                                
+| Status_id        |-|                                
+| Status           | |                                
+| Remarks          | |                                
++------------------+ |                                
+                                                   
 
 
 ```
