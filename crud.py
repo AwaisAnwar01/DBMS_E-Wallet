@@ -98,7 +98,8 @@ def delete_member(db: Session, member_id: int):
         return  {"message":"Member deleted Successfully"}
     
 
-    #CRUD operation for currency supported
+ 
+   #CRUD operation for currency supported
 
 def add_currency(db: Session, currency_supported: schemas.add_currency):
     #import pdb ; pdb.set_trace()
@@ -107,11 +108,6 @@ def add_currency(db: Session, currency_supported: schemas.add_currency):
     db.commit()
     db.refresh(currency_in_db)
     return currency_in_db
-
-
-
-
-
 
 def get_currency(db: Session, currency_id: int):
     return db.query(models.Currency_supported).filter(models.Currency_supported.currency_id ==currency_id ).first()
@@ -141,14 +137,48 @@ def delete_currency(db: Session, currency_id : int):
         return  {"message":"Currency deleted Successfully"}
 
 
+ #CRUD operation for currency_info 
 
-def delete_member(db: Session, member_id: int):
-    member = db.query(models.Member).filter(models.Member.Member_id == member_id).first()
-    if member:
-        db.delete(member)
+def add_currency_info(db: Session, currency_info: schemas.add_currency_info):
+    #import pdb ; pdb.set_trace()
+    currency_info_in_db = models.Currency_info(**currency_info.dict())
+    db.add(currency_info_in_db)
+    db.commit()
+    db.refresh(currency_info_in_db)
+    return currency_info_in_db 
+
+
+
+def get_currency_info(db: Session, currency_info_id: int):
+    return db.query(models.Currency_info).filter(models.Currency_info.currency_info_id ==currency_info_id ).first()
+
+
+
+def get_currencies_info(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Currency_info).offset(skip).limit(limit).all()
+
+
+def update_currency_info(db: Session, currency_info_id: int, currency_info_update: schemas.update_currency_info):
+    currency_info = db.query(models.Currency_info).filter(models.Currency_info.currency_info_id == currency_info_id).first()
+    if not currency_info:
+        raise HTTPException(status_code=404, detail="Currency_info not found")
+    update_data = currency_info_update.dict(exclude_unset=True)
+    db.query(models.Currency_info).filter(models.Currency_info.currency_info_id == currency_info_id).update(update_data)
+    db.commit()
+    db.refresh(currency_info)
+    return  {"message":"Currency_info  Updated Successfully"}
+
+
+def delete_currency_info(db: Session, currency_info_id : int):
+    currency = db.query(models.Currency_info).filter(models.Currency_info.currency_info_id == currency_info_id).first()
+    if currency:
+        db.delete(currency)
         db.commit()
-        return member
-    
+        return  {"message":"Currency_info deleted Successfully"}
+
+
+
+# #CRUD operation for withdrawals
 def get_withdrawal(db: Session, withdrawal_id: int):
     return db.query(models.Withdrawal).filter(models.Withdrawal.withdrawal_id == withdrawal_id).first()
 
@@ -213,7 +243,6 @@ def update_deposit(db: Session, deposit_id: int, deposit_update: schemas.Deposit
     return {"message":"Deposit updated Successfully"}
 
 
-
 def delete_deposit(db: Session, deposit_id: int):
     db_deposit = db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
     if db_deposit:
@@ -221,8 +250,46 @@ def delete_deposit(db: Session, deposit_id: int):
         db.commit()
         return {"message":"Deposit deleted Successfully"}
 
-#CRUD operation for Gateway
 
+# cruds for deposit status
+def create_deposit_status(db: Session, deposit:schemas.add_deposit_status):
+    db_deposit = models.Deposit_status(**deposit.dict())
+    db.add(db_deposit)
+    db.commit()
+    db.refresh(db_deposit)
+    return db_deposit
+
+
+def get_deposit_status(db: Session, deposit_id: int):
+    return db.query(models.Deposit_status).filter(models.Deposit_status.status_id == deposit_id).first()
+
+
+def get_deposit_statuses(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Deposit_status).offset(skip).limit(limit).all()
+
+
+def update_deposit_status(db: Session, deposit_id: int, deposit_status_update: schemas.update_status):
+    status = db.query(models.Deposit_status).filter(models.Deposit_status.status_id == deposit_id).first()
+    if not status:
+        raise HTTPException(status_code=404, detail="Status not found")
+    update_data = update_deposit_status.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(status, key, value)
+    db.commit()
+    db.refresh(status)
+    return {"message":"Status updated Successfully"}
+
+
+def delete_deposit_status(db: Session, status_id: int):
+    db_deposit_status = db.query(models.Deposit_status).filter(models.Deposit_status.status_id == status_id).first()
+    if db_deposit_status:
+        db.delete(db_deposit_status)
+        db.commit()
+        return {"message":"Status deleted Successfully"}
+
+
+
+#CRUD operation for Gateway
 def add_gateway(db: Session, gateway: schemas.add_gateway):
     #import pdb ; pdb.set_trace()
     gateway_in_db = models.gateway(**gateway.dict())

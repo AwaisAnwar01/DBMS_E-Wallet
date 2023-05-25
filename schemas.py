@@ -59,8 +59,7 @@ class Member(MemberBase):
 #currency supported schema
 
 class currency_supported_base(BaseModel):
-    currency_name : str
-    currency_symbol: constr(max_length=10)
+    currency_info_id : int
     status : bool
     USD_equivalent : int
     
@@ -79,6 +78,30 @@ class currency_supported(currency_supported_base):
     
     class config:
         orm_mode = True
+
+
+
+#schema for currency_info 
+
+class  currency_info_base(BaseModel):
+       currency_symbol:  constr(max_length=10)
+       currency_name : str
+       
+
+       class config:
+           orm_mode = True
+class add_currency_info(currency_info_base):
+    pass    
+
+class update_currency_info(currency_info_base):
+    pass
+
+class currency_info (currency_info_base):
+    currency_info_id : int 
+    
+    class config:
+        orm_mode = True
+
 
 
 
@@ -117,8 +140,8 @@ class DepositBase(BaseModel):
     currency_id: int
     date_time: datetime
     gateway_id: int
-    status: int
-    remarks: str
+    status_id: int
+   
 
     class Config:
         orm_mode = True
@@ -133,14 +156,41 @@ class DepositUpdate(DepositBase):
 
 
 class Deposit(DepositBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+#Deposits status INfo Schema
+
+class deposit_status_base(BaseModel):
+
+    status: int
+    remarks: str
+
+    class Config:
+        orm_mode = True
+
+
+class add_deposit_status(deposit_status_base):
+    pass
+
+
+class update_status(deposit_status_base):
+    pass
+
+
+class  deposit_status(deposit_status_base):
    # id: int
 
     class Config:
         orm_mode = True
 
 
-#Gateway  schema
 
+
+#Gateway  schema
 class gateway_base(BaseModel):
     gateway_name : str
     gateway_status: bool
@@ -184,3 +234,15 @@ class TransactionLog(TransactionLogBase):
 
     class Config:
         orm_mode = True
+
+
+
+from pydantic import BaseModel
+
+class MemberTransactionStatus(BaseModel):
+    MemberID: int
+    Username: str
+    EmailAddress: str
+    TotalDepositAmount: float
+    TotalWithdrawalAmount: float
+    TransactionStatus: str
