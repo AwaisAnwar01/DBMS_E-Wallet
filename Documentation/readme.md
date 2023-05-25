@@ -42,7 +42,8 @@ The Digital Wallet Solution System is a platform that allows users to store and 
 - Status id(primary key represented with underline)
 - Status
 - Remarks
- '''
+
+```
 
 
 ### Gateway
