@@ -38,11 +38,10 @@ The Digital Wallet Solution System is a platform that allows users to store and 
 ```
 
 ### Deposit Status
-
- '''
--Status ID(Primary key)
--Status
--Remarks
+```
+- Status id(primary key represented with underline)
+- Status
+- Remarks
  '''
 
 
