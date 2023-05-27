@@ -77,7 +77,7 @@ The Digital Wallet Solution System is a platform that allows users to store and 
 - Middle name
 - Last name
 - Email address
-- Country
+- Country_ID(foreign key)
 - Contact number
 - Username
 - Password
@@ -86,7 +86,13 @@ The Digital Wallet Solution System is a platform that allows users to store and 
 
 ```
 
+### Country Info
+```
 
+-  Country_Id (Primary key)
+-  Country_Name 
+
+```
 ### Withdrawal
 
 ```
@@ -189,18 +195,18 @@ The Digital Wallet Solution System is a platform that enables users to store and
 | Middle_name  |    |                                
 | Last_name    |    |                                
 | Email_address|    |                                
-| Country      |    |                                
-| Contact_number|   |                                
-| Username     |    |                                
-| Password     |    |                               
-| Account_status|   |                                
-| Processed_by  |   |                                
-+--------------+    |                               
-                    |                                
-+--------------+    |                                
+| Country_ID   | <-------+                                
+| Contact_number|   |    |                           
+| Username     |    |    |                           
+| Password     |    |    |  +----------------+                           
+| Account_status|   |    |  | Country INFO   |        
+| Processed_by  |   |    |  +----------------+                       
++--------------+    |    |->| Country_ID     |        
+                    |       | Country Name   |         
++--------------+    |       +----------------+                         
 | Transaction   |   |                                
-+--------------+    |                                
-| Transaction_ID|   |                                
++--------------+    |               
+| Transaction_ID|   |                           
 | Member_ID (FK)|   |                                
 | Type          |   |                                
 | Amount        |   |                                

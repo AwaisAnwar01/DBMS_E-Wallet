@@ -803,6 +803,7 @@ def update_transaction_log(transaction_log_id: int, transaction_log_update: sche
 
     return {"message":"log updated successfully"}
 
+##to be correctd
 # delete a gateway by id
 @app.delete("/Gateway/{gateway_id}", response_model=schemas.gateway)
 def delete_gateway_api(gateway_id: int, db: Session = Depends(get_db)):
@@ -851,7 +852,7 @@ def get_all_transaction_logs(db: Session = Depends(get_db)):
         )
         for row in transaction_logs
     ]
-
+#to be corrected
 @app.put("/transaction_logs/{transaction_log_id}", response_model=schemas.TransactionLog)
 def update_transaction_log(transaction_log_id: int, transaction_log_update: schemas.TransactionLogUpdate,
                           db: Session = Depends(get_db)):
