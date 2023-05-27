@@ -32,7 +32,7 @@ class MemberBase(BaseModel):
     Middle_name: Optional[str] = None
     Last_name: str
     Email: str
-    Country: str
+    Country_Id : int 
     Contact_Number: str
     username: str
     password: str
@@ -54,14 +54,35 @@ class Member(MemberBase):
     class Config:
         orm_mode = True
 
+#Country Info Schema
+class country_supported_base(BaseModel):
+    
+    Country_Name : str
+    
+    class Config:
+        orm_mode = True
+    
+
+class add_country(country_supported_base):
+    pass    
+
+class update_country(country_supported_base):
+    pass
+
+class Country_Info(country_supported_base):
+    Country_Id : int 
+    
+    class config:
+        orm_mode = True
 
 
 #currency supported schema
 
 class currency_supported_base(BaseModel):
-    currency_info_id : int
-    status : bool
+    status : int
     USD_equivalent : int
+    currency_info_id : int
+   
     
     class Config:
         orm_mode = True
@@ -84,8 +105,9 @@ class currency_supported(currency_supported_base):
 #schema for currency_info 
 
 class  currency_info_base(BaseModel):
-       currency_symbol:  constr(max_length=10)
+       currency_symbol: constr(max_length=10)
        currency_name : str
+       
        
 
        class config:

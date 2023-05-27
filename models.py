@@ -16,6 +16,7 @@ class User(Base):
 
 
 
+
 class Member(Base):
     __tablename__ = "Members"
 
@@ -24,7 +25,7 @@ class Member(Base):
     Middle_name = Column(String(20))  #optional Attribute
     Last_name = Column(String(20))
     Email = Column(String(150), index=True,unique=True, nullable=False)
-    Country = Column(String(120))
+    Country_Id = Column(Integer, ForeignKey("Country_Info.Country_Id", onupdate='CASCADE', ondelete='CASCADE'))
     Contact_Number = Column(String(20),unique=True, nullable=False)
     username = Column(String(50), unique=True, index=True)
     password = Column(String(50))
@@ -37,10 +38,20 @@ class Member(Base):
     deposits = relationship("Deposit", back_populates="member", passive_deletes=True)
     withdrawals = relationship('Withdrawal', back_populates='member', passive_deletes=True)
     transaction_logs = relationship('TransactionLog', back_populates='member', passive_deletes=True)
+    currency_info  = relationship('Country_Info', back_populates='member', passive_deletes=True)
 
 
 
+#Country Info id 
+class Country_Info(Base):
+    __tablename__ = "Country_Info"
+    
+    Country_Id = Column(Integer, primary_key=True, index=True)
+    Country_Name = Column(String(40))
 
+
+    member = relationship('Member', back_populates='currency_info', passive_deletes=True)
+    
 
     #Currency_Support Model
 
@@ -48,12 +59,12 @@ class Currency_supported(Base):
     __tablename__= "Currency_Supported"
     
     currency_id=Column(Integer , primary_key= True , index = True)
-    status= Column( Boolean , default= False)
+    status= Column(Integer , default= False)
     USD_equivalent=Column(Integer)
     currency_info_id= Column(Integer, ForeignKey("Currency_info.currency_info_id", onupdate='CASCADE', ondelete='CASCADE'))
 
-    deposits = relationship("Deposit", back_populates="Currency_Supported", passive_deletes=True)
-    currency_info =  relationship("Currency_info", back_populates="Currency_Supported", passive_deletes=True)
+    deposits = relationship("Deposit", back_populates="currency_supported", passive_deletes=True)
+    currency_info =  relationship("Currency_info", back_populates="currency_supported", passive_deletes=True)
 
 
 #currecy_info Model
@@ -64,6 +75,8 @@ class Currency_info(Base):
     currency_info_id=Column(Integer , primary_key= True , index = True)
     currency_name= Column(String(25))
     currency_symbol = Column( String(10))
+
+    currency_supported = relationship("Currency_supported", back_populates="currency_info", passive_deletes=True)
     
 
 class Withdrawal(Base):
@@ -83,7 +96,6 @@ class Withdrawal(Base):
     member = relationship('Member', back_populates='withdrawals', passive_deletes=True)
 
 
-
 #Deposits Model
 class Deposit(Base):
     __tablename__ = "Deposits"
@@ -98,10 +110,12 @@ class Deposit(Base):
     status_id =  Column(Integer, ForeignKey("Deposit_Status.status_id", onupdate='CASCADE',  ondelete="CASCADE"))
     
 
-    member = relationship("Member", back_populates="Deposits", passive_deletes=True)
-    curency_supported = relationship("Currency_supported", back_populates="Deposits", passive_deletes=True)
-    gateway = relationship("gateway", back_populates="Deposits", passive_deletes=True)
-    status = relationship("Deposit_status", back_populates="Deposits", passive_deletes=True)
+    member = relationship("Member", back_populates="deposits", passive_deletes=True)
+    currency_supported = relationship("Currency_supported", back_populates="deposits", passive_deletes=True)
+    gateway = relationship("gateway", back_populates="deposits", passive_deletes=True)
+    status = relationship("Deposit_status", back_populates="deposits", passive_deletes=True)
+
+
 
 #Deposits status model
 class Deposit_status(Base):
@@ -111,6 +125,7 @@ class Deposit_status(Base):
     status = Column(Integer)
     remarks = Column(String(40))
 
+    deposits = relationship("Deposit", back_populates="status", passive_deletes=True)
 
 #Gateway Model
 class gateway(Base):

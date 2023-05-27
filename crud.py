@@ -56,6 +56,7 @@ def delete_user(db: Session, user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
     db.commit()
+    db.refresh(db_user)
     return  {"message":"User deleted Successfully"}
 
 
@@ -73,7 +74,7 @@ def create_member(db: Session, member: schemas.MemberCreate):
 def get_member(db: Session, member_id: int):
     return db.query(Member).filter(Member.Member_id == member_id).first()
 
-
+##to be corrected
 def get_members(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Member).offset(skip).limit(limit).all()
 
@@ -97,8 +98,49 @@ def delete_member(db: Session, member_id: int):
         db.commit()
         return  {"message":"Member deleted Successfully"}
     
+#   File "/Users/awais/Documents/DBMS_Project/main.py", line 283, in read_all_country_info
+#     return crud.get_all_country_info(db=db)
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/Users/awais/Documents/DBMS_Project/crud.py", line 115, in get_all_country_info
+#     return db.query(models.Country_Info).all()
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
  
+#CRUD operations for Country_Info
+
+def create_country_info(db: Session, country_info: schemas.add_country):
+    db_country_info = models.Country_Info(**country_info.dict())
+    db.add(db_country_info)
+    db.commit()
+    db.refresh(db_country_info)
+    return db_country_info
+
+def get_country_info(db: Session, country_id: int):
+    return db.query(models.Country_Info).filter(models.Country_Info.Country_Id == country_id).first()
+
+
+# def get_deposit_statuses(db: Session, skip: int = 0, limit: int = 100):
+#     return db.query(models.Deposit_status).offset(skip).limit(limit).all()
+def get_all_country_info(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Country_Info).offset(skip).limit(limit).all()
+
+def update_country_info(db: Session, country_id: int, country_info: schemas.update_country):
+    db_country_info = db.query(models.Country_Info).filter(models.Country_Info.Country_Id == country_id).first()
+    if db_country_info:
+        for attr, value in country_info.dict().items():
+            setattr(db_country_info, attr, value)
+        db.commit()
+        db.refresh(db_country_info)
+    return db_country_info
+
+def delete_country_info(db: Session, country_id: int):
+    db_country_info = db.query(models.Country_Info).filter(models.Country_Info.Country_Id == country_id).first()
+    if db_country_info:
+        db.delete(db_country_info)
+        db.commit()
+    return db_country_info
+
+
    #CRUD operation for currency supported
 
 def add_currency(db: Session, currency_supported: schemas.add_currency):

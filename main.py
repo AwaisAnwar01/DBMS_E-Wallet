@@ -47,28 +47,6 @@ while True:
 mycursor = mydb.cursor()
 
 
-# @app.post("/posts", status_code=status.HTTP_201_CREATED)
-# def create_post(post: CreatePost):
-
-#     query = "insert into post(title, content) values (%s, %s)"
-#     query2 = "SELECT * FROM post"
-#     mycursor.execute(query, (post.title, post.content))
-#     mycursor.execute(query2)
-#     myresult = mycursor.fetchall()
-#     mydb.commit()
-#     return {"data": myresult}
-# create a new user
-## to be corrected
-# @app.post("/users", response_model=schemas.User)
-# def create_user_api(user: schemas.UserCreate, db: Session = Depends(get_db)):   
-#     query_insert = "INSERT INTO Users (username, password, complete_name, email_address) VALUES (%s, %s, %s, %s)"
-#     query_select = "SELECT * FROM Users"
-#     mycursor.execute(query_insert,((user.username, user.password, user.complete_name, user.email_address)))
-#     mycursor.execute(query_select)
-#     User = mycursor.fetchall()
-#     mydb.commit()
-#     return User
-
 @app.post("/users/", response_model=schemas.UserBase)
 def create_user_api(user: schemas.UserCreate, db: Session = Depends(get_db)):
      db_user = create_user(db=db, user=user)
@@ -179,7 +157,7 @@ def read_members_api(skip: int = 0, limit: int = 100, db: Session = Depends(get_
             Middle_name=row[2],
             Last_name=row[3],
             Email=row[4],
-            Country=row[5],
+            Country_Id=row[5],
             Contact_Number=row[6],
             username=row[7],
             password=row[8],
@@ -204,7 +182,7 @@ def read_member_api(member_id: int, db: Session = Depends(get_db)):
             Middle_name=member[2],
             Last_name=member[3],
             Email=member[4],
-            Country=member[5],
+            Country_ID=member[5],
             Contact_Number=member[6],
             username=member[7],
             password=member[8],
@@ -213,7 +191,6 @@ def read_member_api(member_id: int, db: Session = Depends(get_db)):
         )
     
 
-# update a member by id
 @app.put("/members/{member_id}", response_model=schemas.Member)
 def update_member_api(member_id: int, member_update: schemas.MemberUpdate, db: Session = Depends(get_db)):
     query = text("""
@@ -222,7 +199,7 @@ def update_member_api(member_id: int, member_update: schemas.MemberUpdate, db: S
             Middle_name = :middle_name,
             Last_name = :last_name,
             Email = :email,
-            Country = :country,
+            Country_ID = :Country_Id,
             Contact_Number = :contact_number,
             username = :username,
             password = :password,
@@ -237,7 +214,7 @@ def update_member_api(member_id: int, member_update: schemas.MemberUpdate, db: S
         "middle_name": member_update.Middle_name,
         "last_name": member_update.Last_name,
         "email": member_update.Email,
-        "country": member_update.Country,
+        "Country_Id": member_update.Country_Id,
         "contact_number": member_update.Contact_Number,
         "username": member_update.username,
         "password": member_update.password,
@@ -252,6 +229,7 @@ def update_member_api(member_id: int, member_update: schemas.MemberUpdate, db: S
     if updated_member is None:
         raise HTTPException(status_code=404, detail="Member not found")
 
+    # Return the updated member with all fields
     return {"MESSAGE":"Member Updated Successfully"}
 
 
@@ -265,11 +243,43 @@ def delete_member_api(member_id: int, db: Session = Depends(get_db)):
     return crud.delete_member(db=db, member_id = member_id)
 
 
+#creating a new currrency
+@app.post("/country_info/", response_model=schemas.Country_Info)
+def create_country_info(country_info: schemas.add_country, db: Session = Depends(get_db)):
+    try:
+        return crud.create_country_info(db=db, country_info=country_info)
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
+
+
+@app.get("/country_info/{country_id}", response_model=schemas.Country_Info)
+def read_country_info(country_id: int, db: Session = Depends(get_db)):
+    db_country_info = crud.get_country_info(db=db, country_id=country_id)
+    if db_country_info is None:
+        raise HTTPException(status_code=404, detail="Country info not found")
+    return db_country_info
+
+@app.get("/country_info/", response_model=list[schemas.Country_Info])
+def read_all_country_info(db: Session = Depends(get_db)):
+    return crud.get_all_country_info(db=db)
+
+@app.put("/country_info/{country_id}", response_model=schemas.Country_Info)
+def update_country_info(country_id: int, country_info: schemas.update_country, db: Session = Depends(get_db)):
+    db_country_info = crud.update_country_info(db=db, country_id=country_id, country_info=country_info)
+    if db_country_info is None:
+        raise HTTPException(status_code=404, detail="Country info not found")
+    return db_country_info
+
+@app.delete("/country_info/{country_id}", response_model=schemas.Country_Info)
+def delete_country_info(country_id: int, db: Session = Depends(get_db)):
+    db_country_info = crud.delete_country_info(db=db, country_id=country_id)
+    if db_country_info is None:
+        raise HTTPException(status_code=404, detail="Country info not found")
+    return db_country_info
 # API's for operations of currency_supported entity
 
 # Adding a New currency 
-
 @app.post("/currency_supported/", response_model=schemas.currency_supported)
 def add_currency_api(currency_supported: schemas.add_currency,  db: Session = Depends(get_db)):
     try:
@@ -287,11 +297,11 @@ def read_currencies_api(skip: int = 0, limit: int = 100, db: Session = Depends(g
     currency = mycursor.fetchall()
     return [
         schemas.currency_supported(
-            currency_info_id=row[0],
-            currency_id=row[1],
-            status=row[2],
-            USD_equivalent=row[3],
-          
+            currency_id=row[0],
+            status=row[1],
+            USD_equivalent=row[2],
+            currency_info_id =row[3],
+
         )
         for row in currency
     ]
@@ -308,10 +318,10 @@ def read_currency_api(currency_id: int, db: Session = Depends(get_db)):
     if currency is None:
         raise HTTPException(status_code=404, detail="Currency not found")
     return schemas.currency_supported(
-            currency_info_id=currency[0],
-            currency_id=currency[1],
-            status=currency[2],
-            USD_equivalent=currency[3],
+            currency_id=currency[0],
+            status=currency[1],
+            USD_equivalent=currency[2],
+            currency_info_id =currency[3],
            
         )
 
@@ -340,13 +350,14 @@ def update_currency_api(currency_id: int, currency_update: schemas.update_curren
 
     return updated_currency
 
-# delete a currency by id
-@app.delete("/currency_supported/{currenc_id}", response_model=schemas.currency_supported)
+
+#Delete currency
+@app.delete("/currency_supported/{currency_id}", response_model=schemas.currency_supported)
 def delete_currency_api(currency_id: int, db: Session = Depends(get_db)):
     db_currency = crud.get_currency(db, currency_id=currency_id)
     if db_currency is None:
-        raise HTTPException(status_code=404, detail="currency not found")
-    return crud.delete_currency(db=db,currency_id = currency_id)  
+        raise HTTPException(status_code=404, detail="Currency not found")
+    return crud.delete_currency(db=db, currency_id=currency_id)
 
 
 
@@ -483,7 +494,7 @@ def get_all_withdrawals(db: Session = Depends(get_db)):
     ]
    
 
-
+#to be checked 
 @app.put("/withdrawals/{withdrawal_id}", response_model=schemas.Withdrawal)
 def update_withdrawal(withdrawal_id: int, withdrawal: schemas.WithdrawalUpdate, db: Session = Depends(get_db)):
     query = text("""
@@ -558,7 +569,7 @@ def read_deposits(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
         )
         for row in Deposits
     ]
-    
+# to be corrected
 # get a specific deposit by id
 @app.get("/Deposit/{deposit_id}", response_model=schemas.Deposit)
 def read_deposit(deposit_id: int, db: Session = Depends(get_db)):
@@ -605,6 +616,7 @@ def update_deposit(deposit_id: int, deposit_update: schemas.DepositUpdate, db: S
 
     return updated_deposit
 
+#to be corrected
  
 # delete a deposit by id
 @app.delete("/Deposit/{deposit_id}", response_model=schemas.Deposit)
@@ -616,8 +628,6 @@ def delete_deposit(deposit_id: int, db: Session = Depends(get_db)):
 
 
  #API's to for deposit status
-
-
 @app.post("/Deposit_status/", response_model=schemas.deposit_status)
 def add_deposit_status(deposit: schemas.add_deposit_status,  db: Session = Depends(get_db)):
     try:
@@ -636,12 +646,12 @@ def read_statuses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     return [
         schemas.deposit_status(
             status_id =row[0],
-            status=row[2],
-            remarks =row[3],
+            status=row[1],
+            remarks =row[2],
         )
         for row in Deposits
     ]
-    
+## to be corrected
 # get a specific deposit by id
 @app.get("/Deposit_status/{status_id}", response_model=schemas.deposit_status)
 def read_deposit_status(status_id: int, db: Session = Depends(get_db)):
@@ -721,7 +731,7 @@ def read_gateways_api(skip: int = 0, limit: int = 100, db: Session = Depends(get
         for row in gateway
     ]
     
-
+##to be corrected
 # get a specific gateway by id
 @app.get("/Gateway/{gateway_id}", response_model=schemas.gateway)
 def read_gateway_api(gateway_id: int, db: Session = Depends(get_db)):
