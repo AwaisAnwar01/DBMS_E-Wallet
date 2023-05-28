@@ -49,7 +49,7 @@ class MemberUpdate(MemberBase):
 
 
 class Member(MemberBase):
-   # id: int
+    #id: int
 
     class Config:
         orm_mode = True
@@ -105,12 +105,12 @@ class currency_supported(currency_supported_base):
 #schema for currency_info 
 
 class  currency_info_base(BaseModel):
-       currency_symbol: constr(max_length=10)
+       currency_symbol: str
        currency_name : str
        
        
 
-       class config:
+       class Config:
            orm_mode = True
 class add_currency_info(currency_info_base):
     pass    
@@ -121,7 +121,7 @@ class update_currency_info(currency_info_base):
 class currency_info (currency_info_base):
     currency_info_id : int 
     
-    class config:
+    class Config:
         orm_mode = True
 
 
@@ -137,19 +137,21 @@ class WithdrawalBase(BaseModel):
     method: str
     status: int
     remarks: str
-
-
+    member_id : int
+    
+    class Config:
+        orm_mode = True
 class WithdrawalCreate(WithdrawalBase):
-    member_id: int
+    pass
 
 
 class WithdrawalUpdate(WithdrawalBase):
+    
     pass
 
 
 class Withdrawal(WithdrawalBase):
     withdrawal_id: int
-    member_id: int
 
     class Config:
         orm_mode = True

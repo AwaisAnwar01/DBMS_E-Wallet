@@ -13,6 +13,7 @@ from pymysql.err import IntegrityError
 
 
 
+
 #crud operations for user 
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(**user.dict())
@@ -49,19 +50,15 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
     db.refresh(db_user)
     return  {"message":"User Updated Successfully"}
 
-
 def delete_user(db: Session, user_id: int):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
     db.commit()
-    db.refresh(db_user)
-    return  {"message":"User deleted Successfully"}
-
+    return {"message": "User deleted successfully"}
 
 #crud operations for members
-
 def create_member(db: Session, member: schemas.MemberCreate):
     db_member = models.Member(**member.dict())
     db.add(db_member)
@@ -69,7 +66,15 @@ def create_member(db: Session, member: schemas.MemberCreate):
     db.refresh(db_member)
     return db_member
 
-
+def update_member(db: Session, member_id: int, member_update: MemberUpdate):
+    member = db.query(Member).filter(Member.Member_id == member_id).first()
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    update_data = member_update.dict(exclude_unset=True)
+    db.query(Member).filter(Member.Member_id == member_id).update(update_data)
+    db.commit()
+    db.refresh(member)
+    return  {"message":"Member updated Successfully"}
 
 def get_member(db: Session, member_id: int):
     return db.query(Member).filter(Member.Member_id == member_id).first()
@@ -98,14 +103,6 @@ def delete_member(db: Session, member_id: int):
         db.commit()
         return  {"message":"Member deleted Successfully"}
     
-#   File "/Users/awais/Documents/DBMS_Project/main.py", line 283, in read_all_country_info
-#     return crud.get_all_country_info(db=db)
-#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/Users/awais/Documents/DBMS_Project/crud.py", line 115, in get_all_country_info
-#     return db.query(models.Country_Info).all()
-#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
- 
 #CRUD operations for Country_Info
 
 def create_country_info(db: Session, country_info: schemas.add_country):
@@ -285,13 +282,15 @@ def update_deposit(db: Session, deposit_id: int, deposit_update: schemas.Deposit
     return {"message":"Deposit updated Successfully"}
 
 
+
 def delete_deposit(db: Session, deposit_id: int):
     db_deposit = db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
     if db_deposit:
         db.delete(db_deposit)
         db.commit()
-        return {"message":"Deposit deleted Successfully"}
-
+        return db_deposit
+    else:
+        raise HTTPException(status_code=404, detail="Deposit not found")
 
 # cruds for deposit status
 def create_deposit_status(db: Session, deposit:schemas.add_deposit_status):
@@ -322,12 +321,24 @@ def update_deposit_status(db: Session, deposit_id: int, deposit_status_update: s
     return {"message":"Status updated Successfully"}
 
 
+def delete_deposit(db: Session, deposit_id: int):
+    db_deposit = db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
+    if db_deposit:
+        db.delete(db_deposit)
+        db.commit()
+        return db_deposit
+    else:
+        raise HTTPException(status_code=404, detail="Deposit not found")
+
 def delete_deposit_status(db: Session, status_id: int):
     db_deposit_status = db.query(models.Deposit_status).filter(models.Deposit_status.status_id == status_id).first()
     if db_deposit_status:
         db.delete(db_deposit_status)
         db.commit()
-        return {"message":"Status deleted Successfully"}
+        return db_deposit_status
+    else:
+        raise HTTPException(status_code=404, detail="Deposit status not found")
+    
 
 
 

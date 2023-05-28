@@ -102,34 +102,14 @@ def update_user_api(user_id: int, user:schemas.UserUpdate , db: Session = Depend
     db.commit()
     return {"message": "User updated successfully"}
 
-
-
-# @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-# def delete(id: str):
-
-#     query = f"delete from post where id = {id}"
-#     mycursor.execute(query)
-#     myresult = mycursor.fetchone()
-#     mydb.commit()
-#     if myresult==None:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post does not exist")
-#     return Response(status_code=status.HTTP_204_NO_CONTENT, detail="Post was deleted")
-
+#to be corrected
 # delete a user by id
-@app.delete("/users/{user_id}")
+@app.delete("/users/{user_id}", response_model=schemas.User)
 def delete_user_api(user_id: int, db: Session = Depends(get_db)):
-    query = "DELETE FROM Users WHERE id = %s"
-    values = (user_id,)
-    mycursor.execute(query, values)
-    
-    if mycursor.rowcount == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
-
-    db.commit()
-    db.close()
-
-    return {"messsge":"User deleted successfully"}
-
+    db_user = crud.read_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return crud.delete_user(db=db, user_id=user_id)
 
 #CRUD operations for Member entity
 #create a new member
@@ -182,7 +162,7 @@ def read_member_api(member_id: int, db: Session = Depends(get_db)):
             Middle_name=member[2],
             Last_name=member[3],
             Email=member[4],
-            Country_ID=member[5],
+            Country_Id=member[5],
             Contact_Number=member[6],
             username=member[7],
             password=member[8],
@@ -190,7 +170,7 @@ def read_member_api(member_id: int, db: Session = Depends(get_db)):
             processed_by_id =member[10]
         )
     
-
+#to be corrected
 @app.put("/members/{member_id}", response_model=schemas.Member)
 def update_member_api(member_id: int, member_update: schemas.MemberUpdate, db: Session = Depends(get_db)):
     query = text("""
@@ -232,8 +212,7 @@ def update_member_api(member_id: int, member_update: schemas.MemberUpdate, db: S
     # Return the updated member with all fields
     return {"MESSAGE":"Member Updated Successfully"}
 
-
-
+#to be corrected
 # delete a member by id``
 @app.delete("/members/{member_id}", response_model=schemas.Member)
 def delete_member_api(member_id: int, db: Session = Depends(get_db)):
@@ -243,7 +222,8 @@ def delete_member_api(member_id: int, db: Session = Depends(get_db)):
     return crud.delete_member(db=db, member_id = member_id)
 
 
-#creating a new currrency
+## all apis are working fine
+#creating a country
 @app.post("/country_info/", response_model=schemas.Country_Info)
 def create_country_info(country_info: schemas.add_country, db: Session = Depends(get_db)):
     try:
@@ -277,8 +257,10 @@ def delete_country_info(country_id: int, db: Session = Depends(get_db)):
     if db_country_info is None:
         raise HTTPException(status_code=404, detail="Country info not found")
     return db_country_info
-# API's for operations of currency_supported entity
 
+
+
+# API's for operations of currency_supported entity
 # Adding a New currency 
 @app.post("/currency_supported/", response_model=schemas.currency_supported)
 def add_currency_api(currency_supported: schemas.add_currency,  db: Session = Depends(get_db)):
@@ -308,7 +290,7 @@ def read_currencies_api(skip: int = 0, limit: int = 100, db: Session = Depends(g
   
 
     
-
+#to be corrected
 # get a specific currency by id
 @app.get("/currency_supported/{currency_id}", response_model=schemas.currency_supported)
 def read_currency_api(currency_id: int, db: Session = Depends(get_db)):
@@ -350,7 +332,7 @@ def update_currency_api(currency_id: int, currency_update: schemas.update_curren
 
     return updated_currency
 
-
+#to be corrected
 #Delete currency
 @app.delete("/currency_supported/{currency_id}", response_model=schemas.currency_supported)
 def delete_currency_api(currency_id: int, db: Session = Depends(get_db)):
@@ -362,7 +344,7 @@ def delete_currency_api(currency_id: int, db: Session = Depends(get_db)):
 
 
 #Api's for currency_info
-
+#Corrected
 @app.post("/currency_info/", response_model=schemas.currency_info)
 def add_currency_info_api(currency_info: schemas.add_currency_info,  db: Session = Depends(get_db)):
     try:
@@ -390,7 +372,7 @@ def read_currencies_info_api(skip: int = 0, limit: int = 100, db: Session = Depe
   
 
     
-
+#to be corrected
 # get a specific currency by id
 @app.get("/currecny_info/{currency_info_id}", response_model=schemas.currency_info)
 def read_currency_info_api(currency_info_id: int, db: Session = Depends(get_db)):
@@ -429,7 +411,7 @@ def update_currency_info_api(currency_info_id: int, currency_info_update: schema
         raise HTTPException(status_code=404, detail="Currency info not found")
 
     return updated_currency_info
-
+#to be corrected
 # delete a currency by id
 @app.delete("/currency_info/{currency_info_id}", response_model=schemas.currency_info)
 def delete_currency_api(currency_info_id: int, db: Session = Depends(get_db)):
@@ -442,8 +424,7 @@ def delete_currency_api(currency_info_id: int, db: Session = Depends(get_db)):
 
 
 #APIs for Deposit entity
-
-
+#all apis are working fine
 @app.post("/withdrawals/", response_model=schemas.Withdrawal)
 def create_withdrawal(withdrawal: schemas.WithdrawalCreate, db: Session = Depends(get_db)):
     return crud.create_withdrawal(db, withdrawal)
@@ -492,44 +473,70 @@ def get_all_withdrawals(db: Session = Depends(get_db)):
         )
         for row in withdrawal
     ]
-   
 
-#to be checked 
+
+
+#Corrected
 @app.put("/withdrawals/{withdrawal_id}", response_model=schemas.Withdrawal)
 def update_withdrawal(withdrawal_id: int, withdrawal: schemas.WithdrawalUpdate, db: Session = Depends(get_db)):
-    query = text("""
-        UPDATE withdrawals 
-        SET transaction_code = :transaction_code, 
-            amount = :amount,
-            charged = :charged,
-            to_receive = :to_receive,
-            date_time = :date_time,
-            method = :method,
-            status = :status,
-            remarks = :remarks
-        WHERE withdrawal_id = :withdrawal_id
-    """)
-
-    values = {
-        "withdrawal_id": withdrawal_id,
-        "transaction_code": withdrawal.transaction_code,
-        "amount": withdrawal.amount,
-        "charged": withdrawal.charged,
-        "to_receive": withdrawal.to_receive,
-        "date_time": withdrawal.date_time,
-        "method": withdrawal.method,
-        "status": withdrawal.status,
-        "remarks": withdrawal.remarks,
-    }
-
-    db.execute(query, values)
-    db.commit()
-
-    updated_withdrawal = crud.get_withdrawal(db, withdrawal_id)
-    if updated_withdrawal is None:
+    db_withdrawal = db.query(models.Withdrawal).get(withdrawal_id)
+    if not db_withdrawal:
         raise HTTPException(status_code=404, detail="Withdrawal not found")
+    
+    # Update the withdrawal object with the provided data
+    db_withdrawal.transaction_code = withdrawal.transaction_code
+    db_withdrawal.amount = withdrawal.amount
+    db_withdrawal.charged = withdrawal.charged
+    db_withdrawal.to_receive = withdrawal.to_receive
+    db_withdrawal.date_time = withdrawal.date_time
+    db_withdrawal.method = withdrawal.method
+    db_withdrawal.status = withdrawal.status
+    db_withdrawal.remarks = withdrawal.remarks
+    db_withdrawal.member_id = withdrawal.member_id
+    
+    db.commit()
+    db.refresh(db_withdrawal)
 
-    return {"message":"Withdrawal updated successfully"}
+    return db_withdrawal
+
+# #to be checked 
+# @app.put("/withdrawals/{withdrawal_id}", response_model=schemas.Withdrawal)
+# def update_withdrawal(withdrawal_id: int, withdrawal: schemas.WithdrawalUpdate, db: Session = Depends(get_db)):
+#     query = text("""
+#         UPDATE withdrawals 
+#         SET transaction_code = :transaction_code, 
+#             amount = :amount,
+#             charged = :charged,
+#             to_receive = :to_receive,
+#             date_time = :date_time,
+#             method = :method,
+#             status = :status,
+#             remarks = :remarks,
+#             member_id = :member_id
+#         WHERE withdrawal_id = :withdrawal_id
+#     """)
+
+#     values = {
+#         "withdrawal_id": withdrawal_id,
+#         "transaction_code": withdrawal.transaction_code,
+#         "amount": withdrawal.amount,
+#         "charged": withdrawal.charged,
+#         "to_receive": withdrawal.to_receive,
+#         "date_time": withdrawal.date_time,
+#         "method": withdrawal.method,
+#         "status": withdrawal.status,
+#         "remarks": withdrawal.remarks,
+#         "member_id":withdrawal.member_id,
+#     }
+
+#     db.execute(query, values)
+#     db.commit()
+
+#     updated_withdrawal = crud.get_withdrawal(db, withdrawal_id)
+#     if updated_withdrawal is None:
+#         raise HTTPException(status_code=404, detail="Withdrawal not found")
+
+#     return {"message":"Withdrawal updated successfully"}
 
 
 
@@ -540,8 +547,8 @@ def delete_withdrawal(withdrawal_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Withdrawal not found")
     return crud.delete_withdrawal(db, withdrawal_id)
 
+#all apis are working fine
 # API's for operations of Deposit entity
-
 # Adding a New Deposit 
 @app.post("/Deposit/", response_model=schemas.Deposit)
 def add_deposit(deposit: schemas.DepositCreate,  db: Session = Depends(get_db)):
@@ -569,7 +576,7 @@ def read_deposits(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
         )
         for row in Deposits
     ]
-# to be corrected
+# Corrected
 # get a specific deposit by id
 @app.get("/Deposit/{deposit_id}", response_model=schemas.Deposit)
 def read_deposit(deposit_id: int, db: Session = Depends(get_db)):
@@ -616,7 +623,7 @@ def update_deposit(deposit_id: int, deposit_update: schemas.DepositUpdate, db: S
 
     return updated_deposit
 
-#to be corrected
+#Corrected
  
 # delete a deposit by id
 @app.delete("/Deposit/{deposit_id}", response_model=schemas.Deposit)
@@ -651,7 +658,7 @@ def read_statuses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
         )
         for row in Deposits
     ]
-## to be corrected
+# to be Corrected
 # get a specific deposit by id
 @app.get("/Deposit_status/{status_id}", response_model=schemas.deposit_status)
 def read_deposit_status(status_id: int, db: Session = Depends(get_db)):
@@ -667,7 +674,7 @@ def read_deposit_status(status_id: int, db: Session = Depends(get_db)):
             
             
         )
-
+#to be corrected
 # update a deposit by id
 @app.put("/Deposit_status/{status_id}", response_model=schemas.deposit_status)
 def update_deposit_status(status_id: int, status_update: schemas.update_status, db: Session = Depends(get_db)):
@@ -680,8 +687,8 @@ def update_deposit_status(status_id: int, status_update: schemas.update_status, 
 
     values = {
         "status_id": status_id,
-        "status": update_deposit_status.status,
-        "remarks": update_deposit_status.remarks,
+        "status": status_update.status,
+        "remarks": status_update.remarks,
     }
 
     db.execute(query, values)
@@ -693,11 +700,14 @@ def update_deposit_status(status_id: int, status_update: schemas.update_status, 
 
     return updated_deposit
 
- 
+
+
+
+ #to be corrected
 # delete a deposit by id
 @app.delete("/Deposit_status/{status_id}", response_model=schemas.deposit_status)
 def delete_deposit_status(status_id: int, db: Session = Depends(get_db)):
-    db_deposit = crud.get_deposit_status(db, status_id = status_id)
+    db_deposit = crud.get_deposit_status(db,status_id = status_id)
     if db_deposit is None:
         raise HTTPException(status_code=404, detail=" Status not found")
     return crud.delete_deposit_status(db=db,status_id= status_id)  
@@ -731,7 +741,7 @@ def read_gateways_api(skip: int = 0, limit: int = 100, db: Session = Depends(get
         for row in gateway
     ]
     
-##to be corrected
+# to be Corrected
 # get a specific gateway by id
 @app.get("/Gateway/{gateway_id}", response_model=schemas.gateway)
 def read_gateway_api(gateway_id: int, db: Session = Depends(get_db)):
@@ -747,7 +757,7 @@ def read_gateway_api(gateway_id: int, db: Session = Depends(get_db)):
             gateway_type=gateway[3],
            
         )
-#to be corrected 
+#Corrected 
 # update a gateway by id
 @app.put("/Gateway/{gateway_id}", response_model=schemas.gateway)
 def update_gateway_api(gateway_id: int, gateway_update: schemas.update_gateway, db: Session = Depends(get_db)):
@@ -775,35 +785,7 @@ def update_gateway_api(gateway_id: int, gateway_update: schemas.update_gateway, 
 
     return updated_gateway
 
-
-
-@app.put("/transaction_logs/{transaction_log_id}", response_model=schemas.TransactionLog)
-def update_transaction_log(transaction_log_id: int, transaction_log_update: schemas.TransactionLogUpdate, db: Session = Depends(get_db)):
-    query = text("""
-        UPDATE transaction_logs 
-        SET transaction_type = :transaction_type, 
-            amount = :amount,
-            status = :status
-        WHERE transaction_log_id = :log_id
-    """)
-
-    values = {
-        "log_id": transaction_log_id,
-        "transaction_type": transaction_log_update.transaction_type,
-        "amount": transaction_log_update.amount,
-        "status": transaction_log_update.status,
-    }
-
-    db.execute(query, values)
-    db.commit()
-
-    updated_transaction_log = crud.get_transaction_log(db, transaction_log_id)
-    if updated_transaction_log is None:
-        raise HTTPException(status_code=404, detail="Transaction Log not found")
-
-    return {"message":"log updated successfully"}
-
-##to be correctd
+#to be correctedß
 # delete a gateway by id
 @app.delete("/Gateway/{gateway_id}", response_model=schemas.gateway)
 def delete_gateway_api(gateway_id: int, db: Session = Depends(get_db)):
@@ -852,7 +834,8 @@ def get_all_transaction_logs(db: Session = Depends(get_db)):
         )
         for row in transaction_logs
     ]
-#to be corrected
+#to be correctded
+
 @app.put("/transaction_logs/{transaction_log_id}", response_model=schemas.TransactionLog)
 def update_transaction_log(transaction_log_id: int, transaction_log_update: schemas.TransactionLogUpdate,
                           db: Session = Depends(get_db)):
@@ -924,4 +907,3 @@ def get_member_transaction_status(member_id: int ,db: Session = Depends(get_db))
     db.close()
 
     return response_data
-
