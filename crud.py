@@ -11,9 +11,6 @@ from pymysql.err import IntegrityError
 
 
 
-
-
-
 #crud operations for user 
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(**user.dict())
@@ -50,15 +47,20 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
     db.refresh(db_user)
     return  {"message":"User Updated Successfully"}
 
+
+#corrected
 def delete_user(db: Session, user_id: int):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
     db.commit()
-    return {"message": "User deleted successfully"}
+    db.refresh(db_user)
+    return  {"message":"User deleted Successfully"}
+
 
 #crud operations for members
+
 def create_member(db: Session, member: schemas.MemberCreate):
     db_member = models.Member(**member.dict())
     db.add(db_member)
@@ -66,15 +68,7 @@ def create_member(db: Session, member: schemas.MemberCreate):
     db.refresh(db_member)
     return db_member
 
-def update_member(db: Session, member_id: int, member_update: MemberUpdate):
-    member = db.query(Member).filter(Member.Member_id == member_id).first()
-    if not member:
-        raise HTTPException(status_code=404, detail="Member not found")
-    update_data = member_update.dict(exclude_unset=True)
-    db.query(Member).filter(Member.Member_id == member_id).update(update_data)
-    db.commit()
-    db.refresh(member)
-    return  {"message":"Member updated Successfully"}
+
 
 def get_member(db: Session, member_id: int):
     return db.query(Member).filter(Member.Member_id == member_id).first()
@@ -103,6 +97,14 @@ def delete_member(db: Session, member_id: int):
         db.commit()
         return  {"message":"Member deleted Successfully"}
     
+#   File "/Users/awais/Documents/DBMS_Project/main.py", line 283, in read_all_country_info
+#     return crud.get_all_country_info(db=db)
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/Users/awais/Documents/DBMS_Project/crud.py", line 115, in get_all_country_info
+#     return db.query(models.Country_Info).all()
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ 
 #CRUD operations for Country_Info
 
 def create_country_info(db: Session, country_info: schemas.add_country):
@@ -213,7 +215,7 @@ def delete_currency_info(db: Session, currency_info_id : int):
     if currency:
         db.delete(currency)
         db.commit()
-        return  {"message":"Currency_info deleted Successfully"}
+        return  currency
 
 
 
@@ -282,15 +284,13 @@ def update_deposit(db: Session, deposit_id: int, deposit_update: schemas.Deposit
     return {"message":"Deposit updated Successfully"}
 
 
-
 def delete_deposit(db: Session, deposit_id: int):
     db_deposit = db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
     if db_deposit:
         db.delete(db_deposit)
         db.commit()
         return db_deposit
-    else:
-        raise HTTPException(status_code=404, detail="Deposit not found")
+
 
 # cruds for deposit status
 def create_deposit_status(db: Session, deposit:schemas.add_deposit_status):
@@ -305,30 +305,30 @@ def get_deposit_status(db: Session, deposit_id: int):
     return db.query(models.Deposit_status).filter(models.Deposit_status.status_id == deposit_id).first()
 
 
-def get_deposit_statuses(db: Session, skip: int = 0, limit: int = 100):
+def get_deposit_status(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Deposit_status).offset(skip).limit(limit).all()
 
 
 def update_deposit_status(db: Session, deposit_id: int, deposit_status_update: schemas.update_status):
-    status = db.query(models.Deposit_status).filter(models.Deposit_status.status_id == deposit_id).first()
-    if not status:
-        raise HTTPException(status_code=404, detail="Status not found")
-    update_data = update_deposit_status.dict(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(status, key, value)
+    deposit_status = db.query(models.Deposit_status).filter(models.Deposit_status.status_id == deposit_id).first()
+    if not deposit_status:
+        raise HTTPException(status_code=404, detail="Deposit status not found")
+    for key, value in deposit_status_update.dict(exclude_unset=True).items():
+        setattr(deposit_status, key, value)
     db.commit()
-    db.refresh(status)
-    return {"message":"Status updated Successfully"}
+    db.refresh(deposit_status)
+    return deposit_status
 
 
-def delete_deposit(db: Session, deposit_id: int):
-    db_deposit = db.query(models.Deposit).filter(models.Deposit.id == deposit_id).first()
-    if db_deposit:
-        db.delete(db_deposit)
+def update_withdrawal(db: Session, withdrawal_id: int, withdrawal: schemas.WithdrawalUpdate):
+    withdrawal_data = db.query(models.Withdrawal).filter(models.Withdrawal.withdrawal_id == withdrawal_id).first()
+    if withdrawal_data:
+        for key, value in withdrawal.dict(exclude_unset=True).items():
+            setattr(withdrawal_data, key, value)
         db.commit()
-        return db_deposit
-    else:
-        raise HTTPException(status_code=404, detail="Deposit not found")
+        db.refresh(withdrawal_data)
+    return  {"message":"Withdrawal updated Successfully"}
+
 
 def delete_deposit_status(db: Session, status_id: int):
     db_deposit_status = db.query(models.Deposit_status).filter(models.Deposit_status.status_id == status_id).first()
@@ -336,9 +336,6 @@ def delete_deposit_status(db: Session, status_id: int):
         db.delete(db_deposit_status)
         db.commit()
         return db_deposit_status
-    else:
-        raise HTTPException(status_code=404, detail="Deposit status not found")
-    
 
 
 
@@ -374,13 +371,21 @@ def update_gateway(db: Session, gateway_id: int, gateway_update: schemas.update_
 
 
 
-def delete_gateway(db: Session, gateway_id : int):
-    gateway = db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id ).first()
+# def delete_gateway(db: Session, gateway_id : int):
+#     gateway = db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id ).first()
+#     if gateway:
+#         db.delete(gateway)
+#         db.commit()
+#         return {"message":"Gateway deleted Successfully"}
+
+def delete_gateway(db: Session, gateway_id: int):
+    gateway = db.query(models.gateway).filter(models.gateway.gateway_id == gateway_id).first()
     if gateway:
         db.delete(gateway)
         db.commit()
-        return {"message":"Gateway deleted Successfully"}
-
+        return gateway
+    else:
+        raise HTTPException(status_code=404, detail="Gateway not found")
 
 #Crud Operations for Transaction Logs 
     
@@ -409,7 +414,6 @@ def update_transaction_log(db: Session, transaction_log_id: int, transaction_log
         db.commit()
         db.refresh(transaction_log_data)
     return transaction_log_data
-
 
 def delete_transaction_log(db: Session, transaction_log_id: int):
     transaction_log_data = db.query(models.TransactionLog).filter(

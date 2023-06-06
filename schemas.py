@@ -49,7 +49,7 @@ class MemberUpdate(MemberBase):
 
 
 class Member(MemberBase):
-    #id: int
+   # id: int
 
     class Config:
         orm_mode = True
